@@ -33,14 +33,12 @@ public class Startup
         services.AddSingleton<IMessageBusClient, MessageBusClient>();
     }
 
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, OrderDbContext context)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
         }
-        
-        context.Database.Migrate();
 
         app.UseRouting();
         app.UseEndpoints(endpoints =>

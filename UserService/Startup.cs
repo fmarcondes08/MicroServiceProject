@@ -27,14 +27,12 @@ public class Startup
         services.AddScoped<IUserService, Services.UserService>();
     }
 
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, UserDbContext context)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
         }
-        
-        context.Database.Migrate();
 
         app.UseRouting();
         app.UseEndpoints(endpoints =>

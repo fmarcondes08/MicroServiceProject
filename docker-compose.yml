@@ -31,6 +31,8 @@ services:
     depends_on:
       - postgres
       - rabbitmq
+    command: >
+      sh -c "dotnet ef database update --project UserService/UserService.csproj && dotnet UserService.dll"
 
   orderservice:
     build:
@@ -42,6 +44,8 @@ services:
     depends_on:
       - postgres
       - rabbitmq
+    command: >
+      sh -c "dotnet ef database update --project OrderService/OrderService.csproj && dotnet OrderService.dll"
 
   notificationservice:
     build:
