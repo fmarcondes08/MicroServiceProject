@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  postgres:
+    image: "postgres:latest"
+    environment:
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DB: "microservicesdb"
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  userservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: userruntime
+    ports:
+      - "5001:80"
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  orderservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: orderruntime
+    ports:
+      - "5002:80"
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  notificationservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: notificationruntime
+    ports:
+      - "5003:80"
+    depends_on:
+      - rabbitmq
+
+volumes:
+  pgdata:
