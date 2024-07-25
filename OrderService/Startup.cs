@@ -31,6 +31,12 @@ public class Startup
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IOrderService, Services.OrderService>();
         services.AddSingleton<IMessageBusClient, MessageBusClient>();
+        
+        // Register UserServiceClient with HttpClient
+        services.AddHttpClient<IUserServiceClient, UserServiceClient>(client =>
+        {
+            client.BaseAddress = new Uri("http://userservice");
+        });
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

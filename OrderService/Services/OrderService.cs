@@ -9,11 +9,13 @@ public class OrderService : IOrderService
 {
     private readonly IOrderRepository _orderRepository;
     private readonly IMessageBusClient _messageBusClient;
+    private readonly IUserServiceClient _userServiceClient;
 
-    public OrderService(IOrderRepository orderRepository, IMessageBusClient messageBusClient)
+    public OrderService(IOrderRepository orderRepository, IMessageBusClient messageBusClient, IUserServiceClient userServiceClient)
     {
         _orderRepository = orderRepository;
         _messageBusClient = messageBusClient;
+        _userServiceClient = userServiceClient;
     }
 
     public async Task<IEnumerable<Order>> GetAllOrdersAsync()
@@ -31,6 +33,11 @@ public class OrderService : IOrderService
         if (order == null || string.IsNullOrWhiteSpace(order.Product) || order.Quantity <= 0 || order.UserId <= 0)
         {
             throw new ArgumentException("Order data is invalid");
+        }
+        
+        if (!await _userServiceClient.UserExistsAsync(order.UserId))
+        {
+            throw new KeyNotFoundException("User not found");
         }
         
         await _orderRepository.AddOrderAsync(order);
@@ -56,6 +63,11 @@ public class OrderService : IOrderService
             throw new KeyNotFoundException("Order not found");
         }
         
+        if (!await _userServiceClient.UserExistsAsync(order.UserId))
+        {
+            throw new KeyNotFoundException("User not found");
+        }
+        
         await _orderRepository.UpdateOrderAsync(order);
     }
 
@@ -73,10 +85,14 @@ public class OrderService : IOrderService
         
         await _orderRepository.DeleteOrderAsync(id);
     }
-    
+
+    #region private methods
+
     private async Task<bool> OrderExistsAsync(int id)
     {
         var order = await _orderRepository.GetOrderByIdAsync(id);
         return order != null;
     }
+
+    #endregion
 }

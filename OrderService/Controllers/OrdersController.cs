@@ -57,6 +57,11 @@ public class OrdersController : ControllerBase
             // Returns 400 if order data is invalid
             return BadRequest(ex.Message);
         }
+        catch (KeyNotFoundException ex)
+        {
+            // Returns 404 if user not found
+            return NotFound(ex.Message);
+        }
     }
 
     // PUT: api/orders/{id}
